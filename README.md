@@ -8,17 +8,6 @@ To get credentials and activate Drive API, follow steps detailed in: https://dev
 
 Once your "client_secret_XXXXXXXXXXX.json" file is downloaded, rename it to "client_secret.json" and save it in project root folder.
 
-Save your images in "Pictures" folder and change FILES variable accordingly:
-
-'''
-FILES = (
-    ('Pictures/foto1.jpg', 'image/jpeg'),
-    ('Pictures/foto2.jpg', 'image/jpeg'),
-)
-'''
-
-Don't forget to change mimetype depending on your file type.
-
 Install needed libraries:
 
 Open a console and install modules using pip.
@@ -36,3 +25,17 @@ Finally, you can test your file using:
 python img_uploader.py
 
 First time you do it, your browser will open to approve permissions. It is only first time.
+
+## To upload a file you should change following variables:
+
+### Ruta del archivo local
+localname = 'Pictures/foto1.jpg'
+
+### Nombre del archivo en el servidor
+servername = 'sonarabsolute2018.jpg'
+
+### MimeType depending on the file format
+mimeType = 'image/jpeg'
+
+## File Google Drive URL Link
+If the uploading is OK it will be stored in URL_drive variable.
