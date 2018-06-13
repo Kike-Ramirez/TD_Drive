@@ -7,40 +7,55 @@ from apiclient import discovery
 from httplib2 import Http
 from oauth2client import file, client, tools
 
+import threading
+import time
+import logging
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='(%(threadName)-9s) %(message)s',)
+
 SCOPES = 'https://www.googleapis.com/auth/drive'
 store = file.Storage('storage.json')
 creds = store.get()
+
 if not creds or creds.invalid:
     flow = client.flow_from_clientsecrets('client_secret.json', SCOPES)
     creds = tools.run_flow(flow, store)
+
 DRIVE = discovery.build('drive', 'v3', http=creds.authorize(Http()))
 
-# Aquí definimos los parámetros del archivo a subir, carpeta y enlace. 
-# JAVO, deberías linkar con tu script de TD las variables localname, servername y URL_drive.
+# Aqui definimos los parametros del archivo a subir, carpeta y enlace. 
+# JAVO, deberias linkar con tu script de TD las variables localname, servername y URL_drive.
 
 # Ruta del archivo local
-localname = 'Pictures/foto1.jpg'
+localname = ['pics/p0.jpeg', 'pics/p1.jpeg', 'pics/p2.jpeg', 'pics/p3.jpeg']
 
 # Nombre del archivo en el servidor
-servername = 'sonarabsolute2018.jpg'
+servername = ['ppsonarabsolute2018_0.jpeg', 'ppsonarabsolute2018_1.jpeg', 'ppsonarabsolute2018_2.jpeg', 'ppsonarabsolute2018_3.jpeg']
 
-# Tipo del archivo -MIME TYPE-
+# Tipo del archivo -MIME TYPE-1
 mimeType = 'image/jpeg'
 
 # Id de la carpeta "Pictures" creada en Google Drive.
 folder = ['1MQE1O81aZgC8k2Nxg_i9RSOksJZsQigB']
 
-metadata = {'name': servername, 'mimeType': mimeType, 'parents': folder}
+# Hilo individual que sube cada foto
+def upload_picture(metadata_, localname_, index):
+	# Subimos el archivo y recibimos la respuesta
+	logging.debug('Started uploading: ' + index)
+	res = DRIVE.files().create(body=metadata_, media_body=localname_, fields='id, webViewLink, webContentLink').execute()
 
-# Subimos el archivo y recibimos la respuesta
-res = DRIVE.files().create(body=metadata, media_body=localname, fields='id, webViewLink').execute()
+	if res:
+	    print('Subido "%s" con id: %s' % (localname, res['id']))
+	    URL_drive = res['webViewLink']
 
-if res:
-    print('Subido "%s" con id: %s' % (localname, res['id']))
-    URL_drive = res['webViewLink']
+	logging.debug('Finished: ' + index + ' - ' + URL_drive)
 
+# Funcion principal que lanza los 4 hilos
+if __name__ == '__main__':
 
-# En la variable URL tienes el enlace para verlo
-print('URL Link: %s' % URL_drive)
-
-
+    for i in range(4):
+    	metadata = {'name': servername[i], 'mimeType': mimeType, 'parents': folder}
+        t = threading.Thread(target=upload_picture, args=(metadata, localname[i], i,))
+        t.setDaemon(True)
+        t.start()
