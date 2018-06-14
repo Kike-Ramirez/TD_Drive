@@ -12,7 +12,7 @@ import time
 import logging
 
 
-# Hilo individual que sube cada foto
+# Hilo individual que sube las fotos
 def upload_pictures():
 
 	SCOPES = 'https://www.googleapis.com/auth/drive'
